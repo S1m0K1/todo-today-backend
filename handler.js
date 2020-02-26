@@ -9,11 +9,10 @@ const uuidv4 = require('uuid/v4');
 const mysql = require('mysql');
 
 const connection = mysql.createConnection({
-  host     : 'xxx.eu-west-2.rds.amazonaws.com',
-  user     : 'xxxxxxxx',
-  password : 'xx-xxxxxxxx',  
-  database : 'xxxx_xxxxx'
-  // Do not commit to Github without blocking out values!
+  host     : process.env.DB_HOST,
+  user     : process.env.DB_USER,
+  password : process.env.DB_PASSWORD,  
+  database : process.env.DB_SCHEMA
 });
 
 // Retrieving tasks
