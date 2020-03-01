@@ -7,6 +7,8 @@ const app = express();
 app.use(express.json());
 const uuidv4 = require('uuid/v4');
 const mysql = require('mysql');
+const cors = require('cors');
+app.use(cors());
 
 const connection = mysql.createConnection({
   host: process.env.DB_HOST,
@@ -19,7 +21,7 @@ const connection = mysql.createConnection({
 app.get('/tasks', function (req, res) {
 
   connection.query('SELECT * FROM `task` WHERE `userId` = 1', function (error, results, fields) {
-    // Error will be an Error if one occurred during the query
+    // Error will be an error if one occurred during the query
     if (error) {
       console.error("Your query had a problem fetching tasks", error);
       res.status(500).json({ errorMessage: error });
@@ -50,7 +52,8 @@ app.post('/tasks', function (req, res) {
     else {
       // Return to the client information about the task that has been created
       res.json({
-        task: taskToInsert
+        task: taskToInsert,
+        message: 'A brand new to-do!'
       });
     }
   });
@@ -58,38 +61,40 @@ app.post('/tasks', function (req, res) {
 
 // Updating tasks
 app.put('/tasks/:taskId', function (req, res) {
+
+  // Accept information from the client about what task is being updated, i.e. marked as completed
   const taskToEdit = req.params.taskId;
-  taskToEdit.taskId = uuidv4();
 
   // Execute SQL statement to UPDATE
-  connection.query('UPDATE `task` SET `category` = ?, `description` = ?, `completed` = ?, WHERE `taskId` = ?'), taskToEdit, function (error, results, fields) {
+  connection.query('UPDATE `task` SET `completed` = 1 WHERE `taskId` = ?', taskToEdit, function (error, results, fields) {
     if (error) {
       console.error("Your query had a problem updating the task", error);
       res.status(500).json({ errorMessage: error });
     }
     else {
-      // Return to the client information about the task that has been updated
+      // Return to the client information about the task that has been updated, i.e. marked as completed
       res.json({
-        task: taskToEdit
+        updatedTask: results,
+        message: 'Another to-do done!'
       });
     }
-  };
+  });
 });
 
 // Deleting tasks
 app.delete('/tasks/:taskId', function (req, res) {
-  // Identify task being deleted
-  const taskToDelete = req.params.taskId;
-  taskToDelete.taskId = uuidv4();
 
-  // Execute SQL statement to DELETE
+// Identify task being deleted
+  const taskToDelete = req.body.taskId;
+  
+// Execute SQL statement to DELETE
   connection.query('DELETE FROM `task` WHERE `taskId` = ?'), taskToDelete, function (error, results, fields) {
     if (error) {
       console.error("Your query had a problem deleting the task", error);
       res.status(500).json({ errorMessage: error });
     }
     else {
-      // Return to client info about task that has been deleted
+//       // Return to client info about task that has been deleted
       res.json({
         deletedTask: results,
       });
