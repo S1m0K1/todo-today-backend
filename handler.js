@@ -3,7 +3,6 @@
 const serverless = require('serverless-http');
 const express = require('express');
 const app = express();
-
 app.use(express.json());
 const uuidv4 = require('uuid/v4');
 const mysql = require('mysql');
@@ -85,7 +84,7 @@ app.put('/tasks/:taskId', function (req, res) {
 app.delete('/tasks/:taskId', function (req, res) {
 
 // Identify task being deleted
-  const taskToDelete = req.body.taskId;
+  const taskToDelete = req.params.taskId;
   
 // Execute SQL statement to DELETE
   connection.query('DELETE FROM `task` WHERE `taskId` = ?'), taskToDelete, function (error, results, fields) {
@@ -94,9 +93,11 @@ app.delete('/tasks/:taskId', function (req, res) {
       res.status(500).json({ errorMessage: error });
     }
     else {
-//       // Return to client info about task that has been deleted
+//       // Return to the client information about task that has been deleted
       res.json({
         deletedTask: results,
+        // taskToDelete: taskToDelete,
+        message: 'Your task has been deleted.'
       });
     }
   };
