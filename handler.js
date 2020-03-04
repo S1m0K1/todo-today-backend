@@ -83,24 +83,23 @@ app.put('/tasks/:taskId', function (req, res) {
 // Deleting tasks
 app.delete('/tasks/:taskId', function (req, res) {
 
-// Identify task being deleted
-  const taskToDelete = req.params.taskId;
-  
-// Execute SQL statement to DELETE
-  connection.query('DELETE FROM `task` WHERE `taskId` = ?'), taskToDelete, function (error, results, fields) {
-    if (error) {
-      console.error("Your query had a problem deleting the task", error);
-      res.status(500).json({ errorMessage: error });
-    }
-    else {
-//       // Return to the client information about task that has been deleted
-      res.json({
-        deletedTask: results,
-        // taskToDelete: taskToDelete,
-        message: 'Your task has been deleted.'
-      });
-    }
-  };
-});
+  // Identify task being deleted
+    const taskToDelete = req.params.taskId;
+
+  // Execute SQL statement to DELETE
+    connection.query('DELETE FROM `task` WHERE `taskId` = ?', taskToDelete, function (error, results, fields) {
+      if (error) {
+        console.error("Your query had a problem deleting the task", error);
+        res.status(500).json({ errorMessage: error });
+      }
+      else {
+  // Return to the client information about task that has been deleted
+        res.json({
+          deletedTask: results,
+          message: 'Your task has been deleted.'
+        });
+      }
+    });
+  });
 
 module.exports.tasks = serverless(app);
